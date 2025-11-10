@@ -59,97 +59,12 @@ The agent supports multiple domains including flights, cryptocurrency, weather, 
 
 ---
 
-# Folder Structure
-
-# smart_info_agent/
-## README.md
-Project overview, setup, and usage guide
-
-## requirements.txt
-Dependencies (LangGraph, requests, OpenAI, Streamlit, etc.)
-
-## main.py
-CLI entry point for testing the agent
-
-## app.py
-Streamlit interface for interactive chat
-
-# config/
-## __init__.py
-## settings.py
-API keys, constants, config parameters
-
-# core/
-## __init__.py
-## graph_builder.py
-Constructs LangGraph workflow
-
-## memory_store.py
-In-memory storage management
-
-## intent_classifier.py
-Classifies user intent
-
-## response_synthesizer.py
-Generates final responses
-
-## state_schema.py
-Agent schema
-
-# nodes/
-## __init__.py
-
-## memory_node.py
-Reads/writes memory
-
-## decision_node.py
-Routes workflow based on intent
-
-## response_node.py
-Synthesizes final output
-
-## amadeus_node.py
-Handles flight-related queries via Amadeus API
-
-## crypto_node.py
-Handles cryptocurrency-related queries via CoinMarket API
-
-## weather_node.py
-Handles weather-related queries via Weather Stack API
-
-## numverify_node.py
-Handles phone number verification via Numverify API
-
-# tools/
-## __init__.py
-
-## amadeus_tool.py
-Wrapper for Amadeus API
-
-## crypto_tool.py
-Wrapper for CoinMarket API
-
-## weather_tool.py
-Wrapper for Weather Stack API
-
-## numverify_tool.py
-Wrapper for Numverify API
-
-# data/
-## __init__.py
-## memory_dump.json
-Optional memory snapshot for evaluation
-
-
----
-
-## Folder Purpose Summary
+## Folder Summary
 
 | Folder       | Purpose                                                                 |
 |-------------|-------------------------------------------------------------------------|
 | **config/**  | API keys, constants, LangGraph setup                                    |
 | **core/**    | Graph building, memory management, intent classification, response synthesis |
-| **nodes/**   | Individual LangGraph nodes (API, memory, decision, response)            |
 | **tools/**   | API wrapper tools, utilities                                            |
 | **data/**    | Runtime memory and sample data                                          |
 
