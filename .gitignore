@@ -1,0 +1,5 @@
+.env
+.vscode
+__pycache__
+visualize.py
+my_graph.png
