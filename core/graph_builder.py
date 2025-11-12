@@ -15,6 +15,8 @@ from tools.crypto_tool import get_crypto_price
 from tools.numverify_tool import verify_phone_number
 from tools.amadeus_tool import search_flights_amadeus
 
+from langsmith.run_helpers import traceable
+
 
 # Define the agent's internal state
 class AgentState(TypedDict):
@@ -127,6 +129,7 @@ class SmartInfoAgent:
         self.agent = agent
         self.memory = MemoryStore()
 
+    @traceable(name="SmartInfoAgent.run")
     def run(self, user_input: str) -> str:
         try:
             state: AgentState = {
@@ -141,6 +144,7 @@ class SmartInfoAgent:
             return reply
         except Exception as e:
             return f"Could not complete the request.\nDetails: {e}"
+
 
     def show_history(self):
         return self.memory.get_history()
