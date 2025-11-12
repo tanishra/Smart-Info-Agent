@@ -1,136 +1,186 @@
-# Smart Info Agent
+# 🤖 Smart Info Agent
 
-## Overview
-**Smart Info Agent** is a modular **LangGraph-based intelligent assistant** designed to interact with multiple public APIs, maintain conversational context, and provide synthesized, human-readable answers to user queries.  
+## 📘 Overview
 
-This project serves as a practical demonstration of **modular AI workflow design** and is suitable for training freshers on:  
+**Smart Info Agent** is a modular **LangGraph-based intelligent assistant** that interacts with multiple real-time APIs, maintains conversational context, and provides clear, human-readable answers to diverse user queries.  
 
-- LangGraph **node-tool architecture**  
-- Modular **LLM workflows**  
-- Integration with **real-time APIs**  
-- Managing **memory & conversational context** efficiently  
-- Implementing **intent classification** and response synthesis  
-- Building **interactive user interfaces** with Streamlit  
+It demonstrates **modern AI workflow design** concepts using **LangGraph**, **Azure OpenAI**, and **Streamlit**, making it an ideal project for training and educational purposes.
 
-The agent supports multiple domains including flights, cryptocurrency, weather, and phone number verification, with **follow-up queries** handled contextually.  
-
----
-
-## Key Features
-
-- **Multi-domain Query Support:**  
-  - Flights → Amadeus API  
-  - Crypto → CoinMarket API  
-  - Weather → Weather Stack API  
-  - Phone Verification → Numverify API  
-
-- **Context-Aware Follow-Ups:** Handles queries like:  
-  - “Temperature in Delhi” → “Compare with Mumbai”  
-  - “Price of Bitcoin” → “Compare with Ethereum”  
-
-- **Modular LangGraph Nodes:** Each functionality is encapsulated in its own node, making the system scalable and maintainable.  
-
-- **API Integration via Tools:** Each node uses an API tool wrapper for seamless calls and data retrieval.  
-
-- **Memory & Context Management:** Stores minimal data (user input, previous response, timestamp) to maintain session context.  
-
-- **Intent Classification & Response Synthesis:** Uses LLMs for classifying queries and generating natural, human-readable answers.  
-
-- **Interactive UI with Streamlit:**  
-  - Chat interface  
-  - Spinner during processing  
-  - Persistent chat history  
-  - Proper formatting for multi-line and tabular responses  
-
-- **Extensible Architecture:** New domains and APIs can be added by creating new nodes and tools without disrupting the existing workflow.  
+This system showcases:
+- Multi-node, tool-based architecture  
+- Modular workflow design  
+- Memory and context management  
+- Integration with real-time APIs  
+- Intent classification and natural response generation  
+- Seamless UI integration via Streamlit  
 
 ---
 
-## Suggested Libraries & Tools
+## 🚀 Key Features
 
-- **LangGraph** – Orchestrating nodes and workflow  
-- **OpenAI** – For LLM-driven response synthesis  
-- **Requests** – For API calls  
-- **Streamlit** – User interface for chat  
-- **Datetime** – Timestamping responses  
-- **Python Dict / JSON** – In-memory storage and memory dump  
-- **CoinMarket API, Weather Stack API, Amadeus API, Numverify API** – Real-time data sources  
-- **EURON API** - For LLMs like (OpenAI, Gemini, Llama, Mistral, etc)
-
----
-
-## Folder Summary
-
-| Folder       | Purpose                                                                 |
-|-------------|-------------------------------------------------------------------------|
-| **config/**  | API keys, constants, LangGraph setup                                    |
-| **core/**    | Graph building, memory management, intent classification, response synthesis |
-| **tools/**   | API wrapper tools, utilities                                            |
-| **data/**    | Runtime memory and sample data                                          |
+### 🔹 Multi-Domain Query Support
+Handles live data from multiple APIs:
+| Domain | API Used | Example Query |
+|--------|-----------|----------------|
+| 🌦️ **Weather** | Weather Stack API | “Weather in Delhi” |
+| 💰 **Crypto** | CoinMarket API | “Bitcoin price today” |
+| ✈️ **Flights** | Amadeus API | “Flights from Delhi to Mumbai on 21 Nov” |
+| 📞 **Phone Verification** | Numverify API | “Verify +919690190921” |
 
 ---
 
-## Typical Workflow
-
-1. **User Input:** User submits a query via CLI (`main.py`) or Streamlit (`app.py`).  
-2. **Intent Classification Node:** Determines query type (weather, crypto, flight, phone, etc.).  
-3. **Decision Node:** Routes the query to the appropriate node.  
-4. **Domain Node (API / Memory):** Executes API call or fetches from memory.  
-5. **Response Node:** Synthesizes human-readable response using LLM.  
-6. **Memory Storage:** Updates minimal memory (timestamp, user input, last response) for context and follow-ups.  
-7. **Display:** Streamlit UI shows spinner while processing, then final response with chat history.
+### 🔹 Context-Aware Follow-Ups
+The agent remembers context for follow-up queries:
+- “Temperature in Delhi” → “Compare with Mumbai”  
+- “Bitcoin price” → “Compare with Ethereum”  
 
 ---
 
-## Usage
+### 🔹 Modular LangGraph Nodes
+Each function (LLM, tool execution, decision logic) is encapsulated in its own **LangGraph node**, enabling:
+- Easy debugging  
+- Independent testing  
+- Scalable design  
 
-### CLI Mode
+---
+
+### 🔹 Real-Time API Integration via Tools
+Each tool (e.g., `get_weather_info`, `get_crypto_price`) wraps around an external API and returns structured JSON, which is processed and summarized naturally by the agent.
+
+---
+
+### 🔹 Efficient Memory Management
+Stores minimal conversational data:
+- User query  
+- LLM response  
+- Timestamp  
+
+Memory is handled via a lightweight `MemoryStore` class that can be reset anytime.
+
+---
+
+### 🔹 Natural, Human-Like Responses
+Uses **Azure OpenAI (Chat model)** to:
+- Classify intent  
+- Choose relevant tools  
+- Summarize API outputs  
+- Respond in friendly, concise language  
+
+---
+
+### 🔹 Interactive Streamlit UI
+Beautiful and responsive web interface:
+- Live chat layout  
+- Spinners during processing  
+- Persistent chat history  
+- Clear chat/reset options  
+- Role-based message styling  
+
+---
+
+### 🔹 Extensible & Maintainable Architecture
+Easily extendable by:
+- Adding a new **tool** (API wrapper)  
+- Adding a new **LangGraph node**  
+- Registering the node in the workflow  
+
+---
+
+## 🧩 Tech Stack
+
+| Category | Tool / Library | Purpose |
+|-----------|----------------|----------|
+| **LLM** | Azure OpenAI (Chat) | Query understanding and response synthesis |
+| **Workflow Engine** | LangGraph | Building node-based agent graphs |
+| **Framework** | LangChain | Message handling, tool invocation |
+| **APIs** | Amadeus, CoinMarket, WeatherStack, Numverify | Real-time data sources |
+| **UI** | Streamlit | Interactive web chat interface |
+| **Utility** | Requests, Datetime, JSON | API calls and data handling |
+| **Tracking** | LangSmith | Tracing and monitoring LLM calls |
+
+---
+
+## 🧱 Folder Structure
+
+| Folder | Description |
+|---------|--------------|
+| **config/** | API keys, constants, and Azure model setup |
+| **core/** | LangGraph agent, memory store, and workflow logic |
+| **tools/** | Individual API integration tools |
+| **data/** | Memory dumps, logs, and test data |
+| **main.py** | CLI entry point |
+| **app.py** | Streamlit UI app |
+| **README.md** | Project documentation |
+
+---
+
+## ⚙️ Workflow Overview
+
+1. **User Input** → via CLI or Streamlit UI  
+2. **LLM Node** → Interprets intent and decides tool usage  
+3. **Tool Node** → Executes the corresponding API call  
+4. **Decision Node** → Determines if more tools are needed  
+5. **Response Node** → Summarizes and delivers result  
+6. **Memory Store** → Updates with latest query and response  
+7. **UI Display** → Shows formatted answer in chat interface  
+
+---
+
+## 💻 Usage Instructions
+
+### ▶️ CLI Mode
+
+Run the interactive command-line interface:
 ```bash
 python main.py
 ```
-- Enter queries in console.
-- Exit using exit, quit, or q.
+#### Commands:
+- **exit, quit, q** → End session
+- **history, logs** → Show chat history
+- **clear, reset** → Clear memory
 
-### Streamlit Mode
+---
+
+## 🌐 Streamlit Web App
+Launch the web-based chat interface:
 ```bash
 streamlit run app.py
 ```
-- Enter your question in the input box and click Send.
-- Spinner shows during processing.
-- Chat history is maintained for context-aware follow-ups.
+
+Then open the local URL (usually http://localhost:8501) in your browser.
+
+#### Features:
+- Enter queries in chat input
+- View responses in formatted chat bubbles
+- Clear chat history with one click
+- Observe real-time response timing
+
+--- 
+
+## 🧠 Learnings & Takeaways
+- How to design context-aware AI agents
+- How to build modular, graph-based workflows using LangGraph
+- Integrating multiple APIs efficiently
+- Managing memory and context for better user experience
+- Deploying interactive LLM interfaces using Streamlit
+- Structuring projects for scalability and maintainability
 
 ---
 
-## Example Queries
-
-- **Weather:** What is the current temperature in Delhi
-
-- **Crypto:** What is the current price of bitcoin
-
-- **Flights:** Flights from Delhi to Mumbai on 8th November
-
-- **Phone Verification:** Check this number +91xyxyxyxyxy
+## 🧩 Extending the Agent
+To add a new capability:
+- Create a new tool function inside tools/ (e.g., tools/news_tool.py).
+- Add it to the tools list in core/graph_builder.py.
+- Update the system prompt with its usage rule.
+- Optionally, extend the Streamlit UI for specialized display.
 
 ---
 
+## 🤝 Contributions
+Feel free to contribute! Here’s how you can help improve Smart Info Agent:
+- Fork the repository and create your own branch.
+- Commit your changes with clear, descriptive messages.
+- Test your updates thoroughly (both CLI and Streamlit modes).
+- Submit a Pull Request explaining what feature or fix you added.
 
-## Challenges & Learnings
 
-- Handling context-aware follow-ups across multiple domains
-
-- Integrating multiple third-party APIs in a modular workflow
-
-- Maintaining session memory efficiently for follow-ups
-
-- Designing a scalable node-based architecture
-
-- Implementing real-time Streamlit UI and chat history
-
----
-
-## Deliverables
-
-- Functional LangGraph-based agent (Python files)
-- Fully modular and documented codebase
-- Streamlit interactive demo
-- Sample memory dump
