@@ -26,8 +26,11 @@ Perfect for **learning**, **experimentation**, **student projects**, and buildin
 
 Below are a few screenshots demonstrating the Smart Info Agent in action:
 
-[Normal Mode](data/normal_mode.png)
-[RAG Mode](data/rag_mode.png)
+![Normal Mode](data/normal_mode.png)
+
+---
+
+![RAG Mode](data/rag_mode.png)
 
 
 # 🚀 Key Features
