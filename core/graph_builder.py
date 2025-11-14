@@ -17,15 +17,15 @@ from tools.amadeus_tool import search_flights_amadeus
 
 from langsmith.run_helpers import traceable
 
+from typing import Optional, Callable
 
 # Define the agent's internal state
 class AgentState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
     llm_calls: int
 
-
 # Initialize Azure OpenAI model
-api_version = os.getenv("OPENAI_API_VERSION", "2024-12-01-preview")
+api_version = os.getenv("OPENAI_API_VERSION", settings.OPENAI_API_VERSION)
 
 llm = AzureChatOpenAI(
     azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
@@ -56,7 +56,6 @@ You are SmartInfoAgent — an intelligent AI assistant with access to these tool
 - Be concise, polite, and clear.
 """
 
-
 # Node 1: LLM decides what to do
 def llm_node(state: AgentState) -> dict:
     msgs = state["messages"]
@@ -67,7 +66,6 @@ def llm_node(state: AgentState) -> dict:
         "messages": [response],
         "llm_calls": state.get("llm_calls", 0) + 1
     }
-
 
 # Node 2: Execute tool calls
 def tool_node(state: AgentState) -> dict:
@@ -101,7 +99,6 @@ def tool_node(state: AgentState) -> dict:
 
     return {"messages": results}
 
-
 # Node 3: Decide whether to call tools again or finish
 def decide_next(state: AgentState) -> str:
     msgs = state["messages"]
@@ -109,7 +106,6 @@ def decide_next(state: AgentState) -> str:
     if getattr(last, "tool_calls", []):
         return "tool_node"
     return END
-
 
 # Build the LangGraph workflow
 graph = StateGraph(AgentState)
@@ -122,18 +118,40 @@ graph.add_edge("tool_node", "llm_node")
 
 agent = graph.compile()
 
-
 # Agent wrapper class
 class SmartInfoAgent:
-    def __init__(self):
+    def __init__(self, retriever: Optional[Callable] = None, rag_top_k: int = 5):
+        """
+        retriever: optional function retriever(query, k) -> list[(doc_text, metadata, distance)]
+        """
         self.agent = agent
         self.memory = MemoryStore()
+        self.retriever = retriever
+        self.rag_top_k = rag_top_k
 
     @traceable(name="SmartInfoAgent.run")
     def run(self, user_input: str) -> str:
         try:
+            # If retriever is provided, pull context and prepend to prompt.
+            augmented_input = user_input
+            if self.retriever:
+                try:
+                    results = self.retriever(user_input, k=self.rag_top_k)
+                    if results:
+                        context_blocks = []
+                        for i, (doc, meta, dist) in enumerate(results):
+                            source = meta.get("source", "document")
+                            chunk_idx = meta.get("chunk")
+                            context_blocks.append(f"Source: {source} (chunk {chunk_idx})\n{doc}")
+                        context_str = "\n\n---\n\n".join(context_blocks)
+                        # Prepend context to the user's question with an instruction
+                        augmented_input = f"[DOCUMENTS CONTEXT START]\n{context_str}\n[DOCUMENTS CONTEXT END]\n\nUser question: {user_input}"
+                except Exception as e:
+                    # If retrieval fails, just continue with the raw user_input
+                    print("Retrieval error:", e)
+
             state: AgentState = {
-                "messages": [HumanMessage(content=user_input)],
+                "messages": [HumanMessage(content=augmented_input)],
                 "llm_calls": 0
             }
             result_state = self.agent.invoke(state)
@@ -144,7 +162,6 @@ class SmartInfoAgent:
             return reply
         except Exception as e:
             return f"Could not complete the request.\nDetails: {e}"
-
 
     def show_history(self):
         return self.memory.get_history()
