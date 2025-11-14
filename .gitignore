@@ -3,4 +3,5 @@
 __pycache__
 visualize.py
 my_graph.png
-data
+data/memory.json
+data/__init__.py
