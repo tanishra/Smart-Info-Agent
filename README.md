@@ -6,7 +6,7 @@
 
 - **LangGraph** for agent workflow orchestration  
 - **Azure OpenAI** for reasoning, tool-calling, and summarization  
-- **Chroma Cloud + HuggingFace Embeddings** for powerful document RAG  
+- **Chroma Cloud + AzureOpenAI Embeddings** for powerful document RAG  
 - **Streamlit** for an interactive, modern chat UI  
 - **Deep OCR-based document parsing** (PDF/DOCX/Image/TXT)
 
@@ -44,7 +44,7 @@ Upload PDF, DOCX, TXT, JPG, PNG → system extracts + chunks + embeds + retrieve
 
 - OCR (Tesseract + PyMuPDF)
 - Text chunking with overlap
-- HuggingFace embeddings
+- AzureOpenAI embeddings
 - Chroma Cloud vector database
 
 Ask questions directly about your documents:
@@ -105,7 +105,7 @@ The LLM automatically calls these tools when needed.
 1. Parse files (PDF/DOCX/IMG/TXT)
 2. Extract text (with OCR fallback)
 3. Chunk text (configurable size & overlap)
-4. Embed using HuggingFace MiniLM model
+4. Embed using AzureOpenAI embedding model
 5. Store chunks in **Chroma Cloud**
 6. Retrieve top-k relevant chunks
 7. Inject them into the query as context
@@ -152,7 +152,7 @@ The LLM:
 | **Framework** | LangChain | Prompting & tool binding |
 | **Workflow Engine** | LangGraph | Multi-node agent orchestration |
 | **Vector DB** | Chroma Cloud | Store + retrieve document chunks |
-| **Embeddings** | HuggingFace MiniLM | Semantic search |
+| **Embeddings** | AzureOpenAI | Semantic search |
 | **OCR** | Tesseract, PyMuPDF | PDF/image text extraction |
 | **UI** | Streamlit | Chat interface |
 | **Monitoring** | LangSmith | LLM call tracing |
@@ -169,7 +169,7 @@ The LLM:
 
 | Folder/File | Description |
 |-------------|-------------|
-| **config/** | Contains `settings.py` with all environment variables, API keys, Azure OpenAI setup, Chroma Cloud credentials, HuggingFace token, and configuration constants. |
+| **config/** | Contains `settings.py` with all environment variables, API keys, Azure OpenAI setup, Chroma Cloud credentials and configuration constants. |
 | **core/** | Core logic of the system including LangGraph agent workflow, RAG pipeline, memory management, and advanced document parsing. |
 | **core/graph_builder.py** | Implements the **SmartInfoAgent** built using LangGraph. Handles LLM node, tool node, decision node, memory store, and RAG integration. |
 | **core/rag.py** | Complete RAG pipeline: document parsing (PDF/DOCX/IMG/TXT), OCR extraction, chunking, embeddings, Chroma Cloud indexing, and retriever generation. |
@@ -236,7 +236,7 @@ The LLM:
    Text split into overlapping chunks (configurable).  
 
 4. **Embedding Generation** →  
-   Uses HuggingFace MiniLM model for vectorization.  
+   Uses AzureOpenAI model for vectorization.  
 
 5. **Chroma Cloud Indexing** →  
    Chunks + metadata → stored in vector database.  
@@ -294,7 +294,7 @@ Then open the local URL (usually http://localhost:8501) in your browser.
 - Building modular, node-based workflows using **LangGraph**  
 - Implementing **tool-based architectures** with Azure OpenAI  
 - Integrating multiple external APIs efficiently  
-- Developing a complete **RAG pipeline** with Chroma Cloud & HuggingFace embeddings  
+- Developing a complete **RAG pipeline** with Chroma Cloud & AzureOpenAI embeddings  
 - Applying OCR pipelines for real-world scanned documents  
 - Managing conversational memory for improved UX  
 - Creating interactive, production-style LLM interfaces using **Streamlit**  
