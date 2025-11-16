@@ -7,13 +7,11 @@ import concurrent.futures
 from typing import List
 from PyPDF2 import PdfReader
 import docx
-import fitz  # PyMuPDF
+import fitz  
 from PIL import Image
 import pytesseract
 
-
-
-# Extract text from Image
+#  Image Parser
 def extract_text_from_image_bytes(image_bytes: bytes, timeout: int = 8) -> str:
     """
     Extract text from an image using Tesseract OCR with timeout.
@@ -57,7 +55,6 @@ def extract_text_from_image_bytes(image_bytes: bytes, timeout: int = 8) -> str:
     
 
 
-# Helper
 def parallel_ocr(doc: fitz.Document, blank_pages: List[int], max_pages: int = 5) -> List[str]:
     """
     Perform OCR on up to `max_pages` blank pages concurrently.
@@ -93,8 +90,6 @@ def parallel_ocr(doc: fitz.Document, blank_pages: List[int], max_pages: int = 5)
 
     return ocr_results
 
-
-# Helper
 def extract_image_ocr(pix, timeout=8):
     """Run OCR on a pixmap image safely."""
     try:
@@ -122,7 +117,7 @@ def extract_image_ocr(pix, timeout=8):
         return ""
 
 
-# Extract text from pdf - Text + OCR
+# PDF Parser
 def parse_pdf(file_bytes: bytes, ocr_timeout: int = 8, max_image_pixels: int = 3_000_000) -> str:
     """
     Smart PDF parser:
@@ -161,7 +156,7 @@ def parse_pdf(file_bytes: bytes, ocr_timeout: int = 8, max_image_pixels: int = 3
             if not page_text:
                 try:
                     fpage = doc.load_page(idx - 1)
-                    pix = fpage.get_pixmap(dpi=150)   # Good balance quality
+                    pix = fpage.get_pixmap(dpi=150)   
 
                     # Skip huge pages (memory saver)
                     if pix.width * pix.height > max_image_pixels:
@@ -189,7 +184,7 @@ def parse_pdf(file_bytes: bytes, ocr_timeout: int = 8, max_image_pixels: int = 3
 
     return final_text.strip()
 
-# Extract text from docx
+# Docx Parser
 def parse_docx(file_bytes: bytes) -> str:
     """Extract text from a DOCX document."""
     try:
@@ -202,40 +197,40 @@ def parse_docx(file_bytes: bytes) -> str:
         return ""
 
 
-# Make Chunks
+# Text Chunker
 def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
     """
     Split text into overlapping chunks for embedding / RAG.
     Includes detailed logging for debugging and infinite-loop protection.
     """
 
-    print("[chunk_text] 🔹 Step 1: Starting text chunking...")
+    print("[chunk_text] Step 1: Starting text chunking...")
     print(f"[chunk_text] Received text length: {len(text)} characters")
 
     # Step 2: Normalize newlines
     text = text.replace("\r\n", "\n").strip()
-    print("[chunk_text] 🔹 Step 2: Normalized newlines.")
+    print("[chunk_text] Step 2: Normalized newlines.")
 
     # Step 3: Split into paragraphs and remove blank lines
     paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
-    print(f"[chunk_text] 🔹 Step 3: Paragraphs extracted: {len(paragraphs)}")
+    print(f"[chunk_text] Step 3: Paragraphs extracted: {len(paragraphs)}")
 
     # Step 4: Join paragraphs back into one continuous string
     joined = " ".join(paragraphs)
-    print(f"[chunk_text] 🔹 Step 4: Joined text length: {len(joined)}")
+    print(f"[chunk_text] Step 4: Joined text length: {len(joined)}")
 
     # Step 5: Early exit if no valid text found
     if not joined:
-        print("[chunk_text] ⚠️ Step 5: No valid text found. Returning empty list.")
+        print("[chunk_text] Step 5: No valid text found. Returning empty list.")
         return []
 
     # Step 6: Prevent invalid parameters
     if chunk_size <= overlap:
-        raise ValueError("[chunk_text] ❌ chunk_size must be greater than overlap to avoid infinite loops.")
+        raise ValueError("[chunk_text] chunk_size must be greater than overlap to avoid infinite loops.")
 
     # Step 7: If text smaller than one chunk, return single chunk
     if len(joined) <= chunk_size:
-        print("[chunk_text] ℹ️ Step 7: Text shorter than chunk size. Returning as single chunk.")
+        print("[chunk_text] Step 7: Text shorter than chunk size. Returning as single chunk.")
         return [joined]
 
     # Step 8: Initialize loop variables
@@ -244,12 +239,12 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[st
     length = len(joined)
     iteration = 0
 
-    print(f"[chunk_text] 🔹 Step 8: Starting chunk loop (length={length}, chunk_size={chunk_size}, overlap={overlap})")
+    print(f"[chunk_text] Step 8: Starting chunk loop (length={length}, chunk_size={chunk_size}, overlap={overlap})")
 
     # Step 9: Main loop — create overlapping chunks
     while start < length:
         iteration += 1
-        print(f"[chunk_text] 🔹 Step 9.{iteration}: Iteration {iteration}, start={start}")
+        print(f"[chunk_text] Step 9.{iteration}: Iteration {iteration}, start={start}")
 
         # Calculate end index safely
         end = min(start + chunk_size, length)
@@ -270,21 +265,21 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[st
 
         # Stop if no progress (avoids infinite loop)
         if next_start <= start:
-            print("[chunk_text] ⚠️ Detected no forward progress, breaking loop to avoid infinite loop.")
+            print("[chunk_text] Detected no forward progress, breaking loop to avoid infinite loop.")
             break
 
         start = next_start
 
         # Stop if reached end
         if start >= length:
-            print("[chunk_text] 🔹 Step 10: Reached end of text. Breaking loop.")
+            print("[chunk_text] Step 10: Reached end of text. Breaking loop.")
             break
 
         # Safety guard
         if iteration > 100000:
-            print("[chunk_text] ❌ Safety break: Too many iterations (possible infinite loop).")
+            print("[chunk_text] Safety break: Too many iterations (possible infinite loop).")
             break
 
-    # Step 11: Summary
-    print(f"[chunk_text] ✅ Step 11: Chunking complete. Total chunks created: {len(chunks)}")
+    #  Step 11: Summary
+    print(f"[chunk_text] Step 11: Chunking complete. Total chunks created: {len(chunks)}")
     return chunks
