@@ -1,12 +1,9 @@
-import os
-import io
 import time
 import streamlit as st
 from typing import List, Tuple
 
 from core.graph_builder import SmartInfoAgent
 from core.rag import index_documents, get_retriever_for_collection
-from config import settings
 
 # Page configuration
 st.set_page_config(
@@ -15,6 +12,131 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+st.markdown("""
+<style>
+
+    /* GLOBAL*/
+    body {
+        background-color: #f7f9fc !important;
+        color: #1e293b;
+        font-family: "Inter", sans-serif;
+    }
+
+    .main {
+        background-color: #f7f9fc !important;
+    }
+
+    /* SIDEBAR (glass UI) */
+    [data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(12px) !important;
+        border-right: 1px solid #e2e8f0 !important;
+    }
+
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #2563eb !important;
+        font-weight: 700 !important;
+    }
+
+    /* Radio Buttons */
+    .stRadio > label {
+        font-weight: 600 !important;
+        color: #475569 !important;
+    }
+
+    /* MAIN HEADER*/
+    .chat-title {
+        text-align: center;
+        font-size: 34px;
+        font-weight: 800;
+        color: #1e40af;
+        margin-top: 1rem;
+        margin-bottom: 0.3rem;
+        letter-spacing: -0.5px;
+    }
+
+    .subtext {
+        text-align: center;
+        color: #64748b;
+        font-size: 16px;
+        margin-bottom: 1rem;
+    }
+
+    /* MESSAGE BUBBLES*/
+
+    /* Chat wrapper */
+    div[data-testid="stChatMessage"] {
+        padding: 1rem !important;
+        border-radius: 14px !important;
+        margin-bottom: 1rem !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    /* User bubble (right) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatar"][aria-label='🧑‍💻']) {
+        background: #e8f3ff !important;
+        border: 1px solid #cde4ff !important;
+    }
+
+    /* Assistant bubble (left) */
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatar"][aria-label='🤖']) {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    /* Avatar font size */
+    .stChatMessageAvatar {
+        font-size: 20px !important;
+    }
+
+    /* CHAT INPUT*/
+    .stChatInputContainer {
+        border-radius: 12px !important;
+        border: 1px solid #d0d7e2 !important;
+        background: white !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    /* BUTTONS (Modern)*/
+    .stButton > button {
+        background: #2563eb !important;
+        color: white !important;
+        padding: 0.6rem 1rem !important;
+        border-radius: 10px !important;
+        border: none !important;
+        font-weight: 600 !important;
+        transition: 0.2s;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .stButton > button:hover {
+        background: #1d4ed8 !important;
+        transform: scale(1.02);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+
+    
+    /* File Upload*/
+    .uploadedFile {
+        border-radius: 12px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    /* Alerts */
+    .stAlert {
+        border-radius: 10px !important;
+    }
+            
+    [data-testid="stSidebar"] {
+            background-color: #0F1117 !important;  /* pure dark sidebar */
+        }
+
+</style>
+""", unsafe_allow_html=True)
+
 
 # Sidebar
 with st.sidebar:
@@ -58,7 +180,7 @@ if chat_mode == "Chat with Documents (RAG)":
 
         with st.spinner("🔍 Indexing documents... This may take a few seconds."):
             try:
-                # Now supports OCR and image-based documents
+                # Supports OCR / images
                 collection = index_documents(files, collection_name="session_docs")
                 retriever = get_retriever_for_collection(collection, top_k=5)
 
@@ -74,25 +196,6 @@ if chat_mode == "Chat with Documents (RAG)":
         st.info("📄 Please upload and process documents to start RAG-based chatting.")
 
 # Chat Header
-st.markdown(
-    """
-    <style>
-    .chat-title {
-        text-align: center;
-        font-size: 28px;
-        font-weight: bold;
-        color: #00BFFF;
-        margin-bottom: 0.5rem;
-    }
-    .subtext {
-        text-align: center;
-        color: gray;
-        font-size: 15px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 st.markdown('<div class="chat-title">🤖 Smart Info Agent</div>', unsafe_allow_html=True)
 
 mode_subtext = (
@@ -110,12 +213,16 @@ for msg in st.session_state.messages:
         st.markdown(content)
 
 # Chat Input
-if prompt := st.chat_input("Ask something (e.g., 'Weather in Delhi' or 'What does the document say about pricing?')"):
-    # Display user message instantly
+prompt = st.chat_input(
+    "Ask something (e.g., 'Weather in Delhi' or 'What does the document say about pricing?')"
+)
+
+if prompt:
+    # Show user message
     st.chat_message("user", avatar="🧑‍💻").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Run agent (either normal or RAG mode)
+    # Generate response
     with st.chat_message("assistant", avatar="🤖"):
         with st.spinner("🔍 Thinking..."):
             start = time.time()
@@ -128,9 +235,9 @@ if prompt := st.chat_input("Ask something (e.g., 'Weather in Delhi' or 'What doe
             st.markdown(response)
             st.caption(f"⏱️ Responded in {end - start:.2f}s")
 
-    # Save assistant response
+    # Save response
     st.session_state.messages.append({"role": "assistant", "content": response})
 
 # Footer
 st.markdown("---")
-st.caption("💡 Tip: Try uploading a contract, report, or image of a document and ask, 'Summarize the key points about pricing.'")
+st.caption("💡 Tip: Upload a contract, report, or image and ask: 'Summarize the pricing details.'")
